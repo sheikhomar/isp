@@ -1,0 +1,38 @@
+---
+- hosts: localhost 
+  name: Setup IntSec VM 
+  become: yes
+  become_user: root
+  become_method: sudo
+  vars:
+      - desired_mininet_version: '2.2.1'
+      - mininet_build_directory: '/tmp/mininet_build/'
+  tasks:
+    - name: Update apt cache
+      apt: update_cache=yes cache_valid_time=3600
+    - name: Install necessary tools
+      apt: name={{ item }} state=latest
+      with_items:
+       - wireshark
+       - git
+       - bind9
+       - vim
+       - tshark
+    - name: Ensure bind9 daemon is disabled and not running
+      service: name=bind9 state=stopped enabled=no
+    - name: Check mininet version
+      shell: mn --version
+      register: current_mininet_version
+      changed_when: current_mininet_version.stdout != desired_mininet_version 
+      ignore_errors: yes
+      failed_when: False
+    - name: Ensure that github hostkey is present
+      lineinfile: dest=/etc/ssh/ssh_known_hosts regexp=^github.com line='github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' create=yes
+    - name: Obtain mininet from github
+      git: repo=git://github.com/mininet/mininet version="{{ desired_mininet_version }}" dest="{{ mininet_build_directory }}{{desired_mininet_version}}/mininet"
+      when: desired_mininet_version != current_mininet_version.stdout
+    - name: Compile and install mininet
+      shell: "{{ mininet_build_directory }}{{ desired_mininet_version }}/mininet/util/install.sh -a" 
+      args:
+          chdir: "{{ mininet_build_directory}}"
+      when: desired_mininet_version != current_mininet_version.stdout
