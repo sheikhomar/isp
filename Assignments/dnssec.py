@@ -41,11 +41,11 @@ def run_exercise():
     #Start BIND DNS-server
     net["B"].popen('named', '-g')
 
-    makeTerms([net["B"]], title="DNS")	
+ #   makeTerms([net["B"]], title="DNS")	
 
     #Open terminals
     makeTerms([net["A"]], title="Attacker terminal")
-    makeTerms([net["C"]], title="Victim terminal")
+#    makeTerms([net["C"]], title="Victim terminal")
 
 if __name__ == '__main__':
     run_exercise()
