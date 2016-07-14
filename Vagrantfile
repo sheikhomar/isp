@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
   end
 
   # Shared folder
-  config.vm.synced_folder "Assignments", "/home/vagrant/assignments"
+  config.vm.synced_folder "Assignments", "/home/vagrant/assignments", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=664"]
 
   # Prepare for ansible 
   config.vm.provision "shell", inline: "sudo sed -i.old s#us\.archive\.ubuntu\.com#ftp.snt.utwente.nl/pub/os/linux#g /etc/apt/sources.list"
