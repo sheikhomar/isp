@@ -1,5 +1,0 @@
-zone "localhost" {
-	type master;
-	file "/home/vagrant/assignments/DNS/config/db.local";
-};
-
