@@ -21,6 +21,7 @@
        - vim
        - tshark
        - libnl-dev
+       - pyrit
     - name: Ensure bind9 daemon is disabled and not running
       service: name=bind9 state=stopped enabled=no
     - name: Ensure that bind9 can access the configuration files in the assignments directory (AppArmor)
@@ -53,6 +54,25 @@
       when: aircrackng_stat.stat.exists == False
       args:
         chdir: "{{ aircrackng_build_directory }}"
+    - name: Check cowpatty installation
+      stat: path=/usr/local/bin/cowpatty
+      register: cowpatty_stat
+    - name: Obtain cowpatty from willhackforsushi.com
+      when: cowpatty_stat.stat.exists == False
+      get_url: 
+        url="http://www.willhackforsushi.com/code/cowpatty/4.6/cowpatty-4.6.tgz"
+        dest="/tmp/"
+      register: cowpatty
+    - name: Unpack cowpatty
+      when: cowpatty|changed
+      unarchive:
+        src="/tmp/cowpatty-4.6.tgz"
+        dest="/tmp/"
+    - name: Compile cowpatty
+      shell: "make && make install"
+      args: 
+        chdir: "/tmp/cowpatty-4.6"
+      when: cowpatty|changed
 
   handlers:
     - name: reload named apparmor profile
