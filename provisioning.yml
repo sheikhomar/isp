@@ -7,6 +7,8 @@
   vars:
       - desired_mininet_version: '2.2.1'
       - mininet_build_directory: '/tmp/mininet_build/'
+      - desired_aircrackng_version: '1.2-rc4'
+      - aircrackng_build_directory: '/tmp/aircrack-ng_build/'
   tasks:
     - name: Update apt cache
       apt: update_cache=yes cache_valid_time=3600
@@ -18,6 +20,7 @@
        - bind9
        - vim
        - tshark
+       - libnl-dev
     - name: Ensure bind9 daemon is disabled and not running
       service: name=bind9 state=stopped enabled=no
     - name: Ensure that bind9 can access the configuration files in the assignments directory (AppArmor)
@@ -39,6 +42,18 @@
       args:
           chdir: "{{ mininet_build_directory}}"
       when: desired_mininet_version != current_mininet_version.stdout
+    - name: Check aircrack-ng installation
+      stat: path=/usr/local/bin/aircrack-ng
+      register: aircrackng_stat
+    - name: Obtain aircrack-ng from github
+      git: repo=git://github.com/aircrack-ng/aircrack-ng version="{{ desired_aircrackng_version }}" dest="{{ aircrackng_build_directory }}"
+      when: aircrackng_stat.stat.exists == False
+    - name: Build and install aircrack-ng
+      shell: "make && make install"
+      when: aircrackng_stat.stat.exists == False
+      args:
+        chdir: "{{ aircrackng_build_directory }}"
+
   handlers:
     - name: reload named apparmor profile
       shell: apparmor_parser -r /etc/apparmor.d/usr.sbin.named
