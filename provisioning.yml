@@ -22,8 +22,12 @@
        - tshark
        - libnl-dev
        - pyrit
+       - default-jdk
+       - nginx
     - name: Ensure bind9 daemon is disabled and not running
       service: name=bind9 state=stopped enabled=no
+    - name: Ensure nginx daemon is disabled and not running
+      service: name=nginx state=stopped enabled=no
     - name: Ensure that bind9 can access the configuration files in the assignments directory (AppArmor)
       lineinfile: dest=/etc/apparmor.d/local/usr.sbin.named regexp=^/home/vagrant/assignments/ line='/home/vagrant/assignments/** rw,' create=yes
       notify: reload named apparmor profile
