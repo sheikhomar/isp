@@ -82,8 +82,8 @@
     - name: Install nginx
       apt: deb=/tmp/{{ item }}
       with_items:
-        - "nginx-full_1.4.6-1ubuntu3.6_amd64.deb"
         - "nginx-common_1.4.6-1ubuntu3.6_all.deb"
+        - "nginx-full_1.4.6-1ubuntu3.6_amd64.deb"
     - name: Ensure nginx daemon is disabled and not running
       service: name=nginx state=stopped enabled=no
     - name: Download metasploit
