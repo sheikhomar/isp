@@ -23,7 +23,6 @@
        - libnl-dev
        - pyrit
        - default-jdk
-       - nginx
     - name: Ensure bind9 daemon is disabled and not running
       service: name=bind9 state=stopped enabled=no
     - name: Ensure nginx daemon is disabled and not running
@@ -77,7 +76,22 @@
       args: 
         chdir: "/tmp/cowpatty-4.6"
       when: cowpatty|changed
-
+    - name: Copy nginx packages
+      copy: src=packages/{{ item }} dest=/tmp/
+      with_items:
+        - "nginx-full_1.4.6-1ubuntu3.6_amd64.deb"
+        - "nginx-common_1.4.6-1ubuntu3.6_all.deb"
+    - name: Install nginx
+      apt: deb=/tmp/{{ item }}
+      with_items:
+        - "nginx-full_1.4.6-1ubuntu3.6_amd64.deb"
+        - "nginx-common_1.4.6-1ubuntu3.6_all.deb"
+    - name: Download metasploit
+      get_url:
+        url: https://s3.eu-central-1.amazonaws.com/ut-dacs-packages/metasploit.deb
+        dest: /tmp/metasploit.deb
+    - name: Install metasploit
+      apt: deb=/tmp/metasploit.deb
   handlers:
     - name: reload named apparmor profile
       shell: apparmor_parser -r /etc/apparmor.d/usr.sbin.named
