@@ -92,6 +92,13 @@
         dest: /tmp/metasploit.deb
     - name: Install metasploit
       apt: deb=/tmp/metasploit.deb
+    - name: Create metasploit directory
+      file: path=/home/vagrant/.msf4 state=directory mode=0775 owner=vagrant group=vagrant
+    - name: Initialize metasploit database
+      shell: msfdb init
+      args:
+        creates: /home/vagrant/.msf4/db
+      become_user: vagrant
   handlers:
     - name: reload named apparmor profile
       shell: apparmor_parser -r /etc/apparmor.d/usr.sbin.named
