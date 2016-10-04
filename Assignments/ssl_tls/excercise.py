@@ -16,7 +16,7 @@ class TLSTopo(Topo):
         student = self.addHost('A')
         self.addLink(switch, student)
 
-        for i in range(1,10):
+        for i in range(1,6):
             server = self.addHost("Server-{}".format(i))
             self.addLink(switch, server)
 
@@ -25,17 +25,20 @@ def run_exercise():
     topo = TLSTopo()
     net = Mininet(topo=topo)
     net.start()
-
-    #Verify connectivity
     net.pingAll()
 
-    #Start BIND DNS-server
-    #net["B"].popen('named', '-g', '-c', '/home/vagrant/assignments/DNS/config/named.conf')
-    net["B"].popen('nginx')
+    #Start Nginx HTTP-server
+    net["Server-1"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_1.conf')
+    net["Server-2"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_2.conf')
+    net["Server-3"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_3.conf')
+    net["Server-4"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_4.conf')
+    net["Server-5"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_5.conf')
+
+    #Open wireshark
+    net["A"].popen('wireshark')
 
     #Open terminals
     makeTerms([net["A"]], title="Student terminal")
-    #makeTerms([net["D"]], title="Capture terminal")
 
 if __name__ == '__main__':
     run_exercise()
