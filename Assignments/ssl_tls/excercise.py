@@ -31,6 +31,7 @@ def run_exercise():
 
     #Start BIND DNS-server
     #net["B"].popen('named', '-g', '-c', '/home/vagrant/assignments/DNS/config/named.conf')
+    net["B"].popen('nginx')
 
     #Open terminals
     makeTerms([net["A"]], title="Student terminal")

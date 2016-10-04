@@ -1,0 +1,13 @@
+server {
+	listen   4433;
+
+	ssl    on;
+	ssl_certificate    /home/vagrant/assignments/ssl_tls/certs/algo_1.pem;
+	ssl_certificate_key    /home/vagrant/assignments/ssl_tls/certs/algo_1.key;
+
+	server_name localhost;
+	location / {
+		root   /home/vagrant/Nginx;
+		index  index.html;
+	}
+}
