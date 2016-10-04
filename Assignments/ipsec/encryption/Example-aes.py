@@ -1,0 +1,23 @@
+#!/usr/bin/python
+import base64
+import binascii
+from Crypto.Cipher import AES
+
+key        = bytearray([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f])
+iv_enc     = bytearray([0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00])
+iv_dec     = bytearray([0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00])
+plaintext  = "abcdefghijklmnopabcdefghijklmno"
+
+block_size = 16
+pad_char   = u"\00"
+pad = lambda s: s + (block_size - len(s) % block_size) * pad_char
+
+# Encrypt
+aes_enc    = AES.new(str(key), AES.MODE_CBC, str(iv_enc))
+ciphertext = aes_enc.encrypt(pad(plaintext))
+print "Ciphertext: {}".format(binascii.hexlify(ciphertext))
+
+# Decrypt
+aes_dec    = AES.new(str(key), AES.MODE_CBC, str(iv_dec))
+decrypted = aes_dec.decrypt(ciphertext)
+print "Decrypted text: {} ".format(decrypted.rstrip(pad_char))
