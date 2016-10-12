@@ -100,6 +100,30 @@
       args:
         creates: /home/vagrant/.msf4/db
       become_user: vagrant
+    - name: Create users for SSH exercise
+      user: name=sshuser password=$6$rounds=656000$pzZACWAoLzgn/5C1$HILhQqk0IJnKbTmprtTMXmqip1i0AZ8XCAq3S9J9SKYLqoczq79dKucUws/YEFexKrmohrf1jPoxbTR1M6ulT0
+    - name: Create security limits
+      lineinfile:
+        dest=/etc/security/limits.d/sshuser.conf
+        line='@sshuser - maxlogins 1'
+        create=yes
+    - name: Configure SSH
+      lineinfile:
+        dest=/etc/ssh/ssh_config
+        line='KexAlgorithms diffie-hellman-group-exchange-sha256,curve25519-sha256@libssh.org'
+    - lineinfile:
+        dest=/etc/ssh/ssh_config
+        line='Ciphers aes256-ctr,blowfish-cbc'
+    - lineinfile:
+        dest=/etc/ssh/ssh_config
+        line='MACs hmac-sha1'
+    - lineinfile:
+        dest=/etc/ssh/ssh_config
+        line='HostKeyAlgorithms ssh-rsa,ssh-ed25519'
+    - lineinfile:
+        dest=/etc/motd
+        line='The secret word of tonight is \"Gumbo\"!'
+
   handlers:
     - name: reload named apparmor profile
       shell: apparmor_parser -r /etc/apparmor.d/usr.sbin.named
