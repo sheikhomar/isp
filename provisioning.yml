@@ -123,6 +123,7 @@
     - lineinfile:
         dest=/etc/motd
         line='The secret word of tonight is \"Gumbo\"!'
+        create=yes
     - lineinfile:
         dest=/etc/pam.d/sshd
         state=absent
