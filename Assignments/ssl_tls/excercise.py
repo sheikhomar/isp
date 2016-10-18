@@ -6,6 +6,7 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from mininet.cli import CLI
 from mininet.term import makeTerms
+from mininet.clean import Cleanup
 
 class TLSTopo(Topo):
     def build(self):
@@ -27,18 +28,25 @@ def run_exercise():
     net.start()
     net.pingAll()
 
+    processes = []
+
     #Start Nginx HTTP-server
-    net["Server-1"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_1.conf')
-    net["Server-2"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_2.conf')
-    net["Server-3"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_3.conf')
-    net["Server-4"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_4.conf')
-    net["Server-5"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_5.conf')
+    processes.append(net["Server-1"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_1.conf'))
+    processes.append(net["Server-2"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_2.conf'))
+    processes.append(net["Server-3"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_3.conf'))
+    processes.append(net["Server-4"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_4.conf'))
+    processes.append(net["Server-5"].popen('nginx -p /home/vagrant/assignments/ssl_tls/nginx -c nginx_5.conf'))
 
     #Open wireshark
-    net["A"].popen('wireshark')
+    processes.append(net["A"].popen('wireshark'))
 
     #Open terminals
-    makeTerms([net["A"]], title="Student terminal")
+    processes.append(makeTerms([net["A"]], title="Student terminal")[0])
+
+    raw_input("Press Enter to exit....")
+    for process in processes:
+        process.kill()
+    Cleanup.cleanup()
 
 if __name__ == '__main__':
     run_exercise()
