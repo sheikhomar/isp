@@ -43,15 +43,73 @@ public class Decoder {
   public static final int AES_BLOCK_SIZE = 16;
 
   public static void main(String[] args) throws UnsupportedEncodingException {
-    System.out.println("\n\n===========================\nTry to decrypt packet 1\n");
-    decryptWithAES(espPacket1);
+    //System.out.println("\n\n===========================\nTry to decrypt packet 1\n");
+    //decryptWithAES(espPacket1);
 
-    System.out.println("\n\n===========================\nTry to decrypt packet 2\n");
-    decryptWithAES(espPacket2);
+    //System.out.println("\n\n===========================\nTry to decrypt packet 2\n");
+    //decryptWithAES(espPacket2);
+
+    decryptWithCemellia(camelliaEncodedPacket);
   }
 
-  public static void test3() {
-    System.out.println("Data:    " + toHex(espPacket1));
+  public static void decryptWithCemellia(byte[] packet) throws UnsupportedEncodingException {
+    System.out.println("Packet ("+packet.length+" bytes): " + toHex(packet));
+
+    int espStartPos = 34;
+
+    byte[] spi = Arrays.copyOfRange(packet, espStartPos, espStartPos+4);
+    System.out.println("SPI:   " + toHex(spi));
+
+    byte[] seqNo = Arrays.copyOfRange(packet, espStartPos+4, espStartPos+8);
+    System.out.println("SeqNo: " + toHex(seqNo));
+
+
+    /* Source: https://tools.ietf.org/html/rfc4868
+     *
+    Block size:  the size of the data block the underlying hash algorithm
+      operates upon.  For SHA-256, this is 512 bits, for SHA-384 and
+      SHA-512, this is 1024 bits.
+
+   Output length:  the size of the hash value produced by the underlying
+      hash algorithm.  For SHA-256, this is 256 bits, for SHA-384 this
+      is 384 bits, and for SHA-512, this is 512 bits.
+
+   Authenticator length:  the size of the "authenticator" in bits.  This
+      only applies to authentication/integrity related algorithms, and
+      refers to the bit length remaining after truncation.  In this
+      specification, this is always half the output length of the
+      underlying hash algorithm. */
+    int sizeOfAuth = 16; // 256 bits / 8 = 32 bytes / 2 = 16 bytes
+    byte[] authData = Arrays.copyOfRange(packet, packet.length - sizeOfAuth, packet.length);
+    System.out.println("Authentication Data: " + toHex(authData));
+
+    byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
+    System.out.println("Key:   " + toHex(key));
+
+    int encryptedDataStart = espStartPos+8;
+    int encryptedDataEnd = packet.length - authData.length;
+    byte[] encryptedData = Arrays.copyOfRange(packet, encryptedDataStart, encryptedDataEnd);
+    System.out.println("Encrypted Data ("+encryptedData.length+" bytes):   " + toHex(encryptedData));
+
+    byte[] decryptedData = tryDecryptCemellia(encryptedData, key);
+
+    System.out.println("Decrypted Data:   " + toHex(encryptedData));
+  }
+
+  public static byte[] tryDecryptCemellia(byte[] encryptedData, byte[] key) {
+    try {
+      Cipher cipher = Cipher.getInstance("Camellia/ECB/NoPadding");
+      //Cipher cipher = Cipher.getInstance("Camellia/ECB/NoPadding", "BC");
+
+      SecretKeySpec secretKeySpec = new SecretKeySpec(key, "Camellia");
+      cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+
+      return cipher.doFinal(encryptedData);
+    } catch (Exception e) {
+      System.out.println("Failed to encrypt:");
+      e.printStackTrace();
+      return null;
+    }
   }
 
   public static void decryptWithAES(byte[] packet) throws UnsupportedEncodingException {
@@ -73,8 +131,14 @@ public class Decoder {
     byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
     System.out.println("Key:   " + toHex(key));
 
-    int sizeOfAuth = 12;
-    byte[] authData = Arrays.copyOfRange(packet, packet.length - 12, packet.length);
+    /*
+     HMAC-MD5-96 produces a 128-bit authenticator value.  This 128-bit
+     value can be truncated as described in RFC 2104.  For use with either
+     ESP or AH, a truncated value using the first 96 bits MUST be
+     supported.
+    */
+    int sizeOfAuth = 12; //  96 bits / 8 = 12 bytes!
+    byte[] authData = Arrays.copyOfRange(packet, packet.length - sizeOfAuth, packet.length);
     System.out.println("Authentication Data: " + toHex(authData));
 
     int espPayLoadDataPos = espStartPos+8+AES_BLOCK_SIZE;
@@ -123,7 +187,12 @@ public class Decoder {
     }
   }
 
+
+
   public static String toHex(byte...input){
+    if (input == null)
+      return "<null>";
+
     String prefix = "\n  ";
     String result = prefix;
     int counter = 1;
@@ -192,5 +261,17 @@ public class Decoder {
     (byte)0x76, (byte)0x43, (byte)0x7c, (byte)0xbf, (byte)0x3f, (byte)0x61, (byte)0x1f, (byte)0x2d, (byte)0x6e, (byte)0x69, (byte)0xb7, (byte)0xff, (byte)0x42, (byte)0xc5, (byte)0x9c, (byte)0x6e,
     (byte)0x77, (byte)0x7c, (byte)0xfb, (byte)0xe1, (byte)0x75, (byte)0x6c, (byte)0xfb, (byte)0xbf, (byte)0x68, (byte)0x5a, (byte)0xb3, (byte)0xb6, (byte)0x6c, (byte)0x32, (byte)0x37, (byte)0xfb,
     (byte)0x8e, (byte)0x6b, (byte)0x58, (byte)0xbe, (byte)0x55, (byte)0x01
+  };
+
+  public static byte[] camelliaEncodedPacket = {
+    (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x03, (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x02, (byte)0x08, (byte)0x00, (byte)0x45, (byte)0x00,
+    (byte)0x00, (byte)0x78, (byte)0x00, (byte)0x42, (byte)0x40, (byte)0x00, (byte)0x42, (byte)0x32, (byte)0x20, (byte)0x0e, (byte)0x0a, (byte)0x00, (byte)0x02, (byte)0x03, (byte)0x0a, (byte)0x00,
+    (byte)0x02, (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x05, (byte)0x39, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, (byte)0xa7, (byte)0x82, (byte)0x3b, (byte)0xa0, (byte)0xf9, (byte)0xe5,
+    (byte)0x0d, (byte)0xb2, (byte)0xce, (byte)0x4e, (byte)0x17, (byte)0xbe, (byte)0x16, (byte)0xde, (byte)0xcc, (byte)0xb0, (byte)0x0e, (byte)0x80, (byte)0x3a, (byte)0x8c, (byte)0x62, (byte)0x8a,
+    (byte)0x73, (byte)0x88, (byte)0x01, (byte)0x4d, (byte)0x11, (byte)0xbc, (byte)0xab, (byte)0x7d, (byte)0x7e, (byte)0x35, (byte)0x04, (byte)0x5e, (byte)0x74, (byte)0x79, (byte)0x3d, (byte)0x5a,
+    (byte)0x1a, (byte)0x1d, (byte)0x4e, (byte)0x58, (byte)0xec, (byte)0x84, (byte)0x18, (byte)0x2b, (byte)0x71, (byte)0x9f, (byte)0xbe, (byte)0x51, (byte)0xff, (byte)0x5e, (byte)0x51, (byte)0x81,
+    (byte)0xab, (byte)0x70, (byte)0xaa, (byte)0x1a, (byte)0x99, (byte)0x6f, (byte)0x2e, (byte)0x87, (byte)0xb1, (byte)0x99, (byte)0xc4, (byte)0xe3, (byte)0x61, (byte)0x16, (byte)0x87, (byte)0xe3,
+    (byte)0x7f, (byte)0xc4, (byte)0x4d, (byte)0xaa, (byte)0xb5, (byte)0x8d, (byte)0xdd, (byte)0xa7, (byte)0x84, (byte)0x0a, (byte)0x7e, (byte)0x33, (byte)0xfd, (byte)0x4a, (byte)0xf6, (byte)0x07,
+    (byte)0x5c, (byte)0xc4, (byte)0xfc, (byte)0x55, (byte)0x15, (byte)0x4e
   };
 }
