@@ -2,17 +2,8 @@
  * To compile and run this program, you need "bouncycastle.jar", which can be obtained
  * from https://www.bouncycastle.org/latest_releases.html
  * For convenience, we have already included bcprov-jdk15on-155.jar, which is a recent version.
- * Compiling: javac -classpath <bouncycastle.jar> Example-aes.java
- *            javac -classpath bcprov-jdk15on-155.jar Example-aes.java
- * Running: java -cp <bouncycastle.jar>:. Example-aes
- *          java -cp bcprov-jdk15on-155.jar:. Example-aes
- *  
- *  In this example we encrypt "abcdefghijklmnopabcdefghijklmnop" with key:
- *   [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]
- *   and iv:
- *   [0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00]
- *   using aes in cbc mode without padding.
- *  Than we decrypt the obtained ciphertext.
+ * Compiling: javac -classpath bcprov-jdk15on-155.jar Decoder.java
+ * Running:   java -cp bcprov-jdk15on-155.jar:. Decoder
  */
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -35,144 +26,117 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Decoder {
-  public static final int ESP_HEADER_SIZE = 8;
-  public static final int ESP_SPI_SIZE = 8;
-  public static final int SHA_2_256_BLOCK_SIZE = 512 / 8;
-  public static final int SHA_2_256_RESULT_SIZE = 256 / 8;
-  public static final int MD5_RESULT_SIZE = 16;
-  public static final int AES_BLOCK_SIZE = 16;
+  public static final int ESP_START = 34;
+  public static final int ESP_SPI_START = ESP_START;
+  public static final int ESP_SPI_END = ESP_SPI_START + 4;
+  public static final int ESP_SEQ_START = ESP_SPI_END;
+  public static final int ESP_SEQ_END = ESP_SEQ_START + 4;
+
+  public static final int AES_IV_LEN = 16;
+
+  /**
+   Source: https://tools.ietf.org/html/rfc4868
+   Block size:  the size of the data block the underlying hash algorithm
+   operates upon.  For SHA-256, this is 512 bits, for SHA-384 and
+   SHA-512, this is 1024 bits.
+
+   Output length:  the size of the hash value produced by the underlying
+   hash algorithm.  For SHA-256, this is 256 bits, for SHA-384 this
+   is 384 bits, and for SHA-512, this is 512 bits.
+
+   Authenticator length:  the size of the "authenticator" in bits.  This
+   only applies to authentication/integrity related algorithms, and
+   refers to the bit length remaining after truncation.  In this
+   specification, this is always half the output length of the
+   underlying hash algorithm.
+
+
+    256 bits / 8 = 32 bytes. Half of it is 16 bytes.
+  */
+  public static final int HMAC_SHA2_256_LEN = 16;
+
+  /**
+   HMAC-MD5-96 produces a 128-bit authenticator value.  This 128-bit
+   value can be truncated as described in RFC 2104.  For use with either
+   ESP or AH, a truncated value using the first 96 bits MUST be
+   supported.
+   96 bits / 8 = 12 bytes!
+  */
+  public static final int HMAC_MD5_96_LEN = 12;
 
   public static void main(String[] args) throws UnsupportedEncodingException {
     Security.addProvider(new BouncyCastleProvider());
 
+    byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
+
     //System.out.println("\n\n===========================\nTry to decrypt packet 1\n");
-    //decryptWithAES(espPacket1);
+    extractSecretMessage(espPacket1, key, "AES", HMAC_MD5_96_LEN);
 
     //System.out.println("\n\n===========================\nTry to decrypt packet 2\n");
-    //decryptWithAES(espPacket2);
+    extractSecretMessage(espPacket2, key, "AES", HMAC_MD5_96_LEN);
 
-    decryptWithCemellia(camelliaEncodedPacket);
+    extractSecretMessage(camelliaEncodedPacket, key, "Camellia", HMAC_SHA2_256_LEN);
   }
 
-  public static void decryptWithCemellia(byte[] packet) throws UnsupportedEncodingException {
+  private static void extractSecretMessage(byte[] packet, byte[] key, String encryptionMethod, int authenticationDataLength) throws UnsupportedEncodingException {
     System.out.println("Packet ("+packet.length+" bytes): " + toHex(packet));
 
-    int espStartPos = 34;
-
-    byte[] spi = Arrays.copyOfRange(packet, espStartPos, espStartPos+4);
+    byte[] spi = Arrays.copyOfRange(packet, ESP_SPI_START, ESP_SPI_END);
     System.out.println("SPI:   " + toHex(spi));
 
-    byte[] seqNo = Arrays.copyOfRange(packet, espStartPos+4, espStartPos+8);
+    byte[] seqNo = Arrays.copyOfRange(packet, ESP_SEQ_START, ESP_SEQ_END);
     System.out.println("SeqNo: " + toHex(seqNo));
 
-
-    /* Source: https://tools.ietf.org/html/rfc4868
-     *
-    Block size:  the size of the data block the underlying hash algorithm
-      operates upon.  For SHA-256, this is 512 bits, for SHA-384 and
-      SHA-512, this is 1024 bits.
-
-   Output length:  the size of the hash value produced by the underlying
-      hash algorithm.  For SHA-256, this is 256 bits, for SHA-384 this
-      is 384 bits, and for SHA-512, this is 512 bits.
-
-   Authenticator length:  the size of the "authenticator" in bits.  This
-      only applies to authentication/integrity related algorithms, and
-      refers to the bit length remaining after truncation.  In this
-      specification, this is always half the output length of the
-      underlying hash algorithm. */
-    int sizeOfAuth = 16; // 256 bits / 8 = 32 bytes / 2 = 16 bytes
-    byte[] authData = Arrays.copyOfRange(packet, packet.length - sizeOfAuth, packet.length);
+    byte[] authData = Arrays.copyOfRange(packet, packet.length - authenticationDataLength, packet.length);
     System.out.println("Authentication Data ("+authData.length+" bytes): " + toHex(authData));
 
-    byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
     System.out.println("Key:   " + toHex(key));
 
-    int encryptedDataStart = espStartPos+8;
+    int encryptedDataStart = ESP_SEQ_END;
     int encryptedDataEnd = packet.length - authData.length;
     byte[] encryptedData = Arrays.copyOfRange(packet, encryptedDataStart, encryptedDataEnd);
     System.out.println("Encrypted Data ("+encryptedData.length+" bytes):   " + toHex(encryptedData));
 
-    byte[] decryptedData = tryDecryptCemellia(encryptedData, key);
+    byte[] decryptedData = decrypt(encryptedData, key, encryptionMethod);
 
     printOutSecret(decryptedData);
   }
 
-  public static byte[] tryDecryptCemellia(byte[] encryptedData, byte[] key) {
+  private static byte[] decrypt(byte[] encryptedData, byte[] key, String encryptionMethod) {
     try {
-      Cipher cipher = Cipher.getInstance("Camellia/ECB/NoPadding");
-      SecretKeySpec secretKeySpec = new SecretKeySpec(key, "Camellia");
-      cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+      Cipher cipher = null;
+
+      if ("Camellia".equalsIgnoreCase(encryptionMethod)) {
+        cipher = Cipher.getInstance("Camellia/ECB/NoPadding");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "Camellia");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+
+      } else if ("AES".equalsIgnoreCase(encryptionMethod)) {
+        byte[] iv = Arrays.copyOfRange(encryptedData, 0, AES_IV_LEN);
+        System.out.println("IV:    " + toHex(iv));
+
+        // Exclude IV data since it is not encrypted.
+        encryptedData = Arrays.copyOfRange(encryptedData, iv.length, encryptedData.length);
+
+        cipher = Cipher.getInstance("AES/CBC/NoPadding");
+        SecretKeySpec secretKeySpecy = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpecy, ivParameterSpec);
+      } else {
+        throw new IllegalArgumentException("Method '"+encryptionMethod+"' is unknown.");
+      }
+      System.out.println("Decrypting data:    " + toHex(encryptedData));
 
       return cipher.doFinal(encryptedData);
     } catch (Exception e) {
       System.out.println("Failed to decrypt:");
       e.printStackTrace();
-      return null;
     }
+
+    return null;
   }
 
-  public static void decryptWithAES(byte[] packet) throws UnsupportedEncodingException {
-    System.out.println("Packet ("+packet.length+" bytes): " + toHex(packet));
-
-    int espStartPos = 34;
-
-    byte[] spi = Arrays.copyOfRange(packet, espStartPos, espStartPos+4);
-    System.out.println("SPI:   " + toHex(spi));
-
-    byte[] seqNo = Arrays.copyOfRange(packet, espStartPos+4, espStartPos+8);
-    System.out.println("SeqNo: " + toHex(seqNo));
-
-    // IV for AES must be 16 bytes long.
-    // Assume that IV is comes after the Sequence number.
-    byte[] iv = Arrays.copyOfRange(packet, espStartPos+8, espStartPos+8+AES_BLOCK_SIZE);
-    System.out.println("IV:    " + toHex(iv));
-
-    byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
-    System.out.println("Key:   " + toHex(key));
-
-    /*
-     HMAC-MD5-96 produces a 128-bit authenticator value.  This 128-bit
-     value can be truncated as described in RFC 2104.  For use with either
-     ESP or AH, a truncated value using the first 96 bits MUST be
-     supported.
-    */
-    int sizeOfAuth = 12; //  96 bits / 8 = 12 bytes!
-    byte[] authData = Arrays.copyOfRange(packet, packet.length - sizeOfAuth, packet.length);
-    System.out.println("Authentication Data: " + toHex(authData));
-
-    int espPayLoadDataPos = espStartPos+8+AES_BLOCK_SIZE;
-    int len = packet.length - espPayLoadDataPos - authData.length;
-
-    byte[] decryptedData = tryDecrypt(packet, key, iv, espPayLoadDataPos, len);
-
-    printOutSecret(decryptedData);
-  }
-
-  public static byte[] tryDecrypt(byte[] packet, byte[] key, byte[] iv, int espPayLoadDataPos, int len) {
-    try {
-      // Create cipher aes in cbc mode without padding
-      Cipher aes = Cipher.getInstance("AES/CBC/NoPadding");
-      
-      // Initiate the cipher in decryption mode with the correct iv and key
-      SecretKeySpec secretKeySpecy = new SecretKeySpec(key, "AES");
-      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      aes.init(Cipher.DECRYPT_MODE, secretKeySpecy, ivParameterSpec);
-
-      byte[] cipherText = Arrays.copyOfRange(packet, espPayLoadDataPos, espPayLoadDataPos+len);
-
-      System.out.println("Trying to decrypt byte array of size "+ len + ": " + toHex(cipherText));
-
-      byte[] decryptedPlaintext = aes.doFinal(cipherText);
-      return decryptedPlaintext;
-    } catch (Exception e) {
-      System.out.println("Failed to decrypt:");
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  public static void printOutSecret(byte[] decryptedData) {
+  private static void printOutSecret(byte[] decryptedData) {
     if (decryptedData == null) return;
 
     System.out.println("Decrypted Data ("+decryptedData.length+" bytes): " + toHex(decryptedData));
@@ -194,7 +158,7 @@ public class Decoder {
 
   }
 
-  public static String toHex(byte...input){
+  private static String toHex(byte...input){
     if (input == null)
       return "<null>";
 
@@ -220,31 +184,7 @@ public class Decoder {
     return result;
   }
 
-  public static String toASCII(byte[] bytes) {
-    StringBuffer buf = new StringBuffer();
-    String prefix = "\n  ";
-    buf.append(prefix);
-    for (int i = 0; i < bytes.length; i++) {
-      char ch = (char)bytes[i];
-
-      if (isAsciiPrintable(ch)) {
-        buf.append(ch);
-      } else {
-        buf.append(".");
-      }
-
-      if (i != 0 && i % 16 == 0) {
-        buf.append(prefix);
-      }
-    }
-    return buf.toString();
-  }
-
-  public static boolean isAsciiPrintable(final char ch) {
-    return ch >= 32 && ch < 127;
-  }
-
-  public static byte[] espPacket1 = {
+  private static byte[] espPacket1 = {
     (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x03, (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x02, (byte)0x08, (byte)0x00, (byte)0x45, (byte)0x00,
     (byte)0x00, (byte)0x78, (byte)0x00, (byte)0x42, (byte)0x40, (byte)0x00, (byte)0x42, (byte)0x32, (byte)0x20, (byte)0x0e, (byte)0x0a, (byte)0x00, (byte)0x02, (byte)0x03, (byte)0x0a, (byte)0x00,
     (byte)0x02, (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x05, (byte)0x39, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, (byte)0x0e, (byte)0xbc, (byte)0x21, (byte)0x67, (byte)0xcd, (byte)0x4c,
@@ -256,7 +196,7 @@ public class Decoder {
     (byte)0x33, (byte)0x6d, (byte)0xb4, (byte)0x72, (byte)0x34, (byte)0xf6
   };
 
-  public static byte[] espPacket2 = {
+  private static byte[] espPacket2 = {
     (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x02, (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x03, (byte)0x08, (byte)0x00, (byte)0x45, (byte)0x00,
     (byte)0x00, (byte)0x78, (byte)0x00, (byte)0x42, (byte)0x40, (byte)0x00, (byte)0x42, (byte)0x32, (byte)0x20, (byte)0x0e, (byte)0x0a, (byte)0x00, (byte)0x02, (byte)0x02, (byte)0x0a, (byte)0x00,
     (byte)0x02, (byte)0x03, (byte)0x00, (byte)0x00, (byte)0x13, (byte)0x37, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, (byte)0xc4, (byte)0xd2, (byte)0x78, (byte)0x9b, (byte)0xee, (byte)0x3a,
@@ -268,7 +208,7 @@ public class Decoder {
     (byte)0x8e, (byte)0x6b, (byte)0x58, (byte)0xbe, (byte)0x55, (byte)0x01
   };
 
-  public static byte[] camelliaEncodedPacket = {
+  private static byte[] camelliaEncodedPacket = {
     (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x03, (byte)0xaa, (byte)0xbb, (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0x02, (byte)0x08, (byte)0x00, (byte)0x45, (byte)0x00,
     (byte)0x00, (byte)0x78, (byte)0x00, (byte)0x42, (byte)0x40, (byte)0x00, (byte)0x42, (byte)0x32, (byte)0x20, (byte)0x0e, (byte)0x0a, (byte)0x00, (byte)0x02, (byte)0x03, (byte)0x0a, (byte)0x00,
     (byte)0x02, (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x05, (byte)0x39, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, (byte)0xa7, (byte)0x82, (byte)0x3b, (byte)0xa0, (byte)0xf9, (byte)0xe5,
