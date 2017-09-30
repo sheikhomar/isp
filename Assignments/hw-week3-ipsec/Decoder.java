@@ -83,10 +83,6 @@ public class Decoder {
     byte[] decryptedData = tryDecrypt(packet, key, iv, espPayLoadDataPos, len);
     System.out.println("Decrypted Data ("+decryptedData.length+" bytes): " + toHex(decryptedData));
 
-    String decryptedText = new String(decryptedData, "ASCII");
-    System.out.println("Decrypted Text: " + toASCII(decryptedData));
-
-
     byte nextHeader = decryptedData[decryptedData.length-1];
     System.out.println("Next header: " + toHex(new byte[] { nextHeader}));
 
@@ -97,6 +93,11 @@ public class Decoder {
     int paddingTo = decryptedData.length - 2;
     byte[] paddingData = Arrays.copyOfRange(decryptedData, paddingFrom, paddingTo);;
     System.out.println("Padding Data: " + toHex(paddingData));
+
+
+    byte[] secretMessage = Arrays.copyOfRange(decryptedData, 28, decryptedData.length - paddingData.length - 2);
+    System.out.println("Secret Message: '" + new String(secretMessage) + "'");
+
   }
 
   public static byte[] tryDecrypt(byte[] packet, byte[] key, byte[] iv, int espPayLoadDataPos, int len) {
