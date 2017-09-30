@@ -43,6 +43,8 @@ public class Decoder {
   public static final int AES_BLOCK_SIZE = 16;
 
   public static void main(String[] args) throws UnsupportedEncodingException {
+    Security.addProvider(new BouncyCastleProvider());
+
     //System.out.println("\n\n===========================\nTry to decrypt packet 1\n");
     //decryptWithAES(espPacket1);
 
@@ -81,7 +83,7 @@ public class Decoder {
       underlying hash algorithm. */
     int sizeOfAuth = 16; // 256 bits / 8 = 32 bytes / 2 = 16 bytes
     byte[] authData = Arrays.copyOfRange(packet, packet.length - sizeOfAuth, packet.length);
-    System.out.println("Authentication Data: " + toHex(authData));
+    System.out.println("Authentication Data ("+authData.length+" bytes): " + toHex(authData));
 
     byte[] key = "YELLOW SUBMARINE".getBytes("UTF-8");
     System.out.println("Key:   " + toHex(key));
@@ -93,20 +95,18 @@ public class Decoder {
 
     byte[] decryptedData = tryDecryptCemellia(encryptedData, key);
 
-    System.out.println("Decrypted Data:   " + toHex(encryptedData));
+    printOutSecret(decryptedData);
   }
 
   public static byte[] tryDecryptCemellia(byte[] encryptedData, byte[] key) {
     try {
       Cipher cipher = Cipher.getInstance("Camellia/ECB/NoPadding");
-      //Cipher cipher = Cipher.getInstance("Camellia/ECB/NoPadding", "BC");
-
       SecretKeySpec secretKeySpec = new SecretKeySpec(key, "Camellia");
       cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
 
       return cipher.doFinal(encryptedData);
     } catch (Exception e) {
-      System.out.println("Failed to encrypt:");
+      System.out.println("Failed to decrypt:");
       e.printStackTrace();
       return null;
     }
@@ -145,23 +145,8 @@ public class Decoder {
     int len = packet.length - espPayLoadDataPos - authData.length;
 
     byte[] decryptedData = tryDecrypt(packet, key, iv, espPayLoadDataPos, len);
-    System.out.println("Decrypted Data ("+decryptedData.length+" bytes): " + toHex(decryptedData));
 
-    byte nextHeader = decryptedData[decryptedData.length-1];
-    System.out.println("Next header: " + toHex(new byte[] { nextHeader}));
-
-    byte padLen = decryptedData[decryptedData.length-2];
-    System.out.println("Padding length ("+padLen+" bytes): " + toHex(new byte[] { padLen}));
-
-    int paddingFrom = decryptedData.length - ((int)padLen) - 2;
-    int paddingTo = decryptedData.length - 2;
-    byte[] paddingData = Arrays.copyOfRange(decryptedData, paddingFrom, paddingTo);;
-    System.out.println("Padding Data: " + toHex(paddingData));
-
-
-    byte[] secretMessage = Arrays.copyOfRange(decryptedData, 28, decryptedData.length - paddingData.length - 2);
-    System.out.println("Secret Message: '" + new String(secretMessage) + "'");
-
+    printOutSecret(decryptedData);
   }
 
   public static byte[] tryDecrypt(byte[] packet, byte[] key, byte[] iv, int espPayLoadDataPos, int len) {
@@ -181,13 +166,33 @@ public class Decoder {
       byte[] decryptedPlaintext = aes.doFinal(cipherText);
       return decryptedPlaintext;
     } catch (Exception e) {
-      System.out.println("Failed to encrypt:");
+      System.out.println("Failed to decrypt:");
       e.printStackTrace();
       return null;
     }
   }
 
+  public static void printOutSecret(byte[] decryptedData) {
+    if (decryptedData == null) return;
 
+    System.out.println("Decrypted Data ("+decryptedData.length+" bytes): " + toHex(decryptedData));
+
+    byte nextHeader = decryptedData[decryptedData.length-1];
+    System.out.println("Next header: " + toHex(new byte[] { nextHeader}));
+
+    byte padLen = decryptedData[decryptedData.length-2];
+    System.out.println("Padding length ("+padLen+" bytes): " + toHex(new byte[] { padLen}));
+
+    int paddingFrom = decryptedData.length - ((int)padLen) - 2;
+    int paddingTo = decryptedData.length - 2;
+    byte[] paddingData = Arrays.copyOfRange(decryptedData, paddingFrom, paddingTo);;
+    System.out.println("Padding Data: " + toHex(paddingData));
+
+
+    byte[] secretMessage = Arrays.copyOfRange(decryptedData, 28, decryptedData.length - paddingData.length - 2);
+    System.out.println("Secret Message: '" + new String(secretMessage) + "'");
+
+  }
 
   public static String toHex(byte...input){
     if (input == null)
