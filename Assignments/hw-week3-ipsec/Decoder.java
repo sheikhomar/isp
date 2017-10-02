@@ -32,7 +32,9 @@ public class Decoder {
   public static final int ESP_SEQ_START = ESP_SPI_END;
   public static final int ESP_SEQ_END = ESP_SEQ_START + 4;
 
-  public static final int AES_IV_LEN = 16;
+  public static final int AES_BLOCK_SIZE = 16;
+
+  public static final int CAMELLIA_BLOCK_SIZE = 16;
 
   /**
    Source: https://tools.ietf.org/html/rfc4868
@@ -50,10 +52,10 @@ public class Decoder {
    specification, this is always half the output length of the
    underlying hash algorithm.
 
-
     256 bits / 8 = 32 bytes. Half of it is 16 bytes.
+   However, 16 bytes does not work but 12 bytes work!
   */
-  public static final int HMAC_SHA2_256_LEN = 16;
+  public static final int HMAC_SHA2_256_LEN = 12;
 
   /**
    HMAC-MD5-96 produces a 128-bit authenticator value.  This 128-bit
@@ -73,7 +75,7 @@ public class Decoder {
     extractSecretMessage(espPacket1, key, "AES", HMAC_MD5_96_LEN);
 
     //System.out.println("\n\n===========================\nTry to decrypt packet 2\n");
-    extractSecretMessage(espPacket2, key, "AES", HMAC_MD5_96_LEN);
+    //extractSecretMessage(espPacket2, key, "AES", HMAC_MD5_96_LEN);
 
     extractSecretMessage(camelliaEncodedPacket, key, "Camellia", HMAC_SHA2_256_LEN);
   }
@@ -107,20 +109,23 @@ public class Decoder {
       Cipher cipher = null;
 
       if ("Camellia".equalsIgnoreCase(encryptionMethod)) {
-        cipher = Cipher.getInstance("Camellia/ECB/NoPadding");
+        byte[] iv = Arrays.copyOfRange(encryptedData, 0, CAMELLIA_BLOCK_SIZE);
+        System.out.println("IV:    " + toHex(iv));
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        encryptedData = Arrays.copyOfRange(encryptedData, iv.length, encryptedData.length);
+
+        cipher = Cipher.getInstance("Camellia/CBC/NoPadding");
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, "Camellia");
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
       } else if ("AES".equalsIgnoreCase(encryptionMethod)) {
-        byte[] iv = Arrays.copyOfRange(encryptedData, 0, AES_IV_LEN);
+        byte[] iv = Arrays.copyOfRange(encryptedData, 0, AES_BLOCK_SIZE);
         System.out.println("IV:    " + toHex(iv));
-
-        // Exclude IV data since it is not encrypted.
         encryptedData = Arrays.copyOfRange(encryptedData, iv.length, encryptedData.length);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
         cipher = Cipher.getInstance("AES/CBC/NoPadding");
         SecretKeySpec secretKeySpecy = new SecretKeySpec(key, "AES");
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpecy, ivParameterSpec);
       } else {
         throw new IllegalArgumentException("Method '"+encryptionMethod+"' is unknown.");
