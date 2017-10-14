@@ -36,7 +36,9 @@ class SSHTopo(Topo):
         ssh2    = self.addHost('ssh2', ip='10.0.5.12/24')
         ssh3    = self.addHost('ssh3', ip='10.0.5.13/24')
         httpd   = self.addHost('httpd', ip='10.0.5.80/24')
-        for i in range(1,20):
+        for i in range(0,20):
+            proxy = self.addHost('proxy%i'%i, ip='10.0.5.%i/24'%(20+i))
+            print 'proxy', i, ' has ip ', '10.0.5.%i/24'%(20+i)
             proxy = self.addHost('proxy%i'%i, ip='10.0.5.%i/24'%(20+i))
             self.addLink(proxy,switch)
 
@@ -61,9 +63,10 @@ def run_exercise():
     net['httpd'].cmd('ip addr add fc00::5:8080/64 dev httpd-eth0')
     net['httpd'].cmd('ip addr add fc00::5:8888/64 dev httpd-eth0')
     net['httpd'].cmd('ip addr add fc00::5:8889/64 dev httpd-eth0')
-    for i in range(1,20):
+    for i in range(0,20):
         net['proxy%i'%i].cmd('ip addr add fc00::5:%x/64 dev proxy%i-eth0'%(i*111, i))
-        pids.append(net["proxy%i"%i].popen('/usr/sbin/sshd', '-o', 'PermitTTY=no', '-o', 'ForceCommand=/usr/sbin/nologin').pid)
+        print 'proxy', i, ' has ipv6 ', 'fc00::5:%x/64 dev proxy%i-eth0'%(i*111, i)
+        pids.append(net["proxy%i"%i].popen('/usr/sbin/sshd', '-o', 'PrintMotd=no', '-o', 'ForceCommand=/usr/sbin/nologin').pid)
 
     httpd_pid = net["httpd"].popen('nginx', '-c', '/home/vagrant/assignments/ssh/nginx.conf').pid
     ssh1_sshd_pid = net["ssh1"].popen('/usr/sbin/sshd', '-o', 'Ciphers=3des-cbc', '-o', 'PrintMotd=yes').pid #, '-f', '/home/vagrant/assignments/ssh/ssh1_sshd.conf').pid

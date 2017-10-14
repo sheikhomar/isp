@@ -1,0 +1,282 @@
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: /etc/ssh/ssh_config line 19: Applying options for *
+debug1: Connecting to 10.0.5.11 [10.0.5.11] port 22.
+debug1: Connection established.
+debug1: permanently_set_uid: 0/0
+debug1: SELinux support disabled
+debug1: identity file /root/.ssh/id_rsa type -1
+debug1: identity file /root/.ssh/id_rsa-cert type -1
+debug1: identity file /root/.ssh/id_dsa type -1
+debug1: identity file /root/.ssh/id_dsa-cert type -1
+debug1: identity file /root/.ssh/id_ecdsa type -1
+debug1: identity file /root/.ssh/id_ecdsa-cert type -1
+debug1: identity file /root/.ssh/id_ed25519 type -1
+debug1: identity file /root/.ssh/id_ed25519-cert type -1
+debug1: Enabling compatibility mode for protocol 2.0
+debug1: Local version string SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.8
+debug1: Remote protocol version 2.0, remote software version OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.8
+debug1: match: OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.8 pat OpenSSH_6.6.1* compat 0x04000000
+debug1: SSH2_MSG_KEXINIT sent
+debug1: SSH2_MSG_KEXINIT received
+no matching cipher found: client aes256-ctr,blowfish-cbc server 3des-cbc
+
+
+
+
+
+Which of the following key exchange algorithms are supported by your client?
+
+
+root@vagrant:~/assignments/ssh# ssh -Q kex
+diffie-hellman-group1-sha1
+diffie-hellman-group14-sha1
+diffie-hellman-group-exchange-sha1
+diffie-hellman-group-exchange-sha256
+ecdh-sha2-nistp256
+ecdh-sha2-nistp384
+ecdh-sha2-nistp521
+diffie-hellman-group1-sha1
+curve25519-sha256@libssh.org
+
+
+
+
+
+
+
+
+root@vagrant:~/assignments/ssh# cat /etc/ssh/ssh_config
+
+# This is the ssh client system-wide configuration file.  See
+# ssh_config(5) for more information.  This file provides defaults for
+# users, and the values can be changed in per-user configuration files
+# or on the command line.
+
+# Configuration data is parsed as follows:
+#  1. command line options
+#  2. user-specific file
+#  3. system-wide file
+# Any configuration value is only changed the first time it is set.
+# Thus, host-specific definitions should be at the beginning of the
+# configuration file, and defaults at the end.
+
+# Site-wide defaults for some commonly used options.  For a comprehensive
+# list of available options, their meanings and defaults, please see the
+# ssh_config(5) man page.
+
+Host *
+#   ForwardAgent no
+#   ForwardX11 no
+#   ForwardX11Trusted yes
+#   RhostsRSAAuthentication no
+#   RSAAuthentication yes
+#   PasswordAuthentication yes
+#   HostbasedAuthentication no
+#   GSSAPIAuthentication no
+#   GSSAPIDelegateCredentials no
+#   GSSAPIKeyExchange no
+#   GSSAPITrustDNS no
+#   BatchMode no
+#   CheckHostIP yes
+#   AddressFamily any
+#   ConnectTimeout 0
+#   StrictHostKeyChecking ask
+#   IdentityFile ~/.ssh/identity
+#   IdentityFile ~/.ssh/id_rsa
+#   IdentityFile ~/.ssh/id_dsa
+#   Port 22
+#   Protocol 2,1
+#   Cipher 3des
+#   Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-cbc,3des-cbc
+#   MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160
+#   EscapeChar ~
+#   Tunnel no
+#   TunnelDevice any:any
+#   PermitLocalCommand no
+#   VisualHostKey no
+#   ProxyCommand ssh -q -W %h:%p gateway.example.com
+#   RekeyLimit 1G 1h
+    SendEnv LANG LC_*
+    HashKnownHosts yes
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+KexAlgorithms diffie-hellman-group-exchange-sha256,curve25519-sha256@libssh.org
+Ciphers aes256-ctr,blowfish-cbc
+MACs hmac-sha1
+HostKeyAlgorithms ssh-rsa,ssh-ed25519
+
+
+
+
+
+
+
+CBC, OFB and CFB are similar, however OFB/CFB is better because you only need encryption and not decryption, which can save code space.
+
+CTR is used if you want good parallelization (ie. speed), instead of CBC/OFB/CFB.
+
+
+
+CTR => stream cipher
+CBC => block cipher
+
+root@vagrant:~/assignments/ssh# ssh -Q cipher
+3des-cbc
+blowfish-cbc
+cast128-cbc
+arcfour
+arcfour128
+arcfour256
+aes128-cbc
+aes192-cbc
+aes256-cbc
+rijndael-cbc@lysator.liu.se
+aes128-ctr
+aes192-ctr
+aes256-ctr
+aes128-gcm@openssh.com
+aes256-gcm@openssh.com
+chacha20-poly1305@openssh.com
+
+
+
+
+
+
+
+
+
+
+root@vagrant:~/assignments/ssh# ssh -Q cipher-auth
+aes128-gcm@openssh.com
+aes256-gcm@openssh.com
+chacha20-poly1305@openssh.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@vagrant:~/assignments/ssh# ssh -Q key
+ssh-rsa
+ssh-dss
+ssh-ed25519
+ecdsa-sha2-nistp256
+ecdsa-sha2-nistp384
+ecdsa-sha2-nistp521
+ssh-rsa-cert-v01@openssh.com
+ssh-dss-cert-v01@openssh.com
+ecdsa-sha2-nistp256-cert-v01@openssh.com
+ecdsa-sha2-nistp384-cert-v01@openssh.com
+ecdsa-sha2-nistp521-cert-v01@openssh.com
+ssh-rsa-cert-v00@openssh.com
+ssh-dss-cert-v00@openssh.com
+ssh-ed25519-cert-v01@openssh.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http://[fc00::5:8889]
+channel 4: open failed: administratively prohibited: open failed
+
+
+
+
+
+
+
+
+
+
+
+vim ~/.ssh/config 
+
+
+Host m1
+        HostName 10.0.5.13
+        User sshuser
+        ControlMaster auto
+        ControlPath ~/.ssh/control:%h:%p:%r
+
+
+
+
+
+
+
+http://[fc00::5:8889] 
+
+vagrant@vagrant:~$ sudo python assignments/ssh/ssh.py 
+proxy 0  has ip  10.0.5.20/24
+proxy 1  has ip  10.0.5.21/24
+proxy 2  has ip  10.0.5.22/24
+proxy 3  has ip  10.0.5.23/24
+proxy 4  has ip  10.0.5.24/24
+proxy 5  has ip  10.0.5.25/24
+proxy 6  has ip  10.0.5.26/24
+proxy 7  has ip  10.0.5.27/24
+proxy 8  has ip  10.0.5.28/24
+proxy 9  has ip  10.0.5.29/24
+proxy 10  has ip  10.0.5.30/24
+proxy 11  has ip  10.0.5.31/24
+proxy 12  has ip  10.0.5.32/24
+proxy 13  has ip  10.0.5.33/24
+proxy 14  has ip  10.0.5.34/24
+proxy 15  has ip  10.0.5.35/24
+proxy 16  has ip  10.0.5.36/24
+proxy 17  has ip  10.0.5.37/24
+proxy 18  has ip  10.0.5.38/24
+proxy 19  has ip  10.0.5.39/24
+proxy 0  has ipv6  fc00::5:0/64 dev proxy0-eth0
+proxy 1  has ipv6  fc00::5:6f/64 dev proxy1-eth0
+proxy 2  has ipv6  fc00::5:de/64 dev proxy2-eth0
+proxy 3  has ipv6  fc00::5:14d/64 dev proxy3-eth0
+proxy 4  has ipv6  fc00::5:1bc/64 dev proxy4-eth0
+proxy 5  has ipv6  fc00::5:22b/64 dev proxy5-eth0
+proxy 6  has ipv6  fc00::5:29a/64 dev proxy6-eth0
+proxy 7  has ipv6  fc00::5:309/64 dev proxy7-eth0
+proxy 8  has ipv6  fc00::5:378/64 dev proxy8-eth0
+proxy 9  has ipv6  fc00::5:3e7/64 dev proxy9-eth0
+proxy 10  has ipv6  fc00::5:456/64 dev proxy10-eth0
+proxy 11  has ipv6  fc00::5:4c5/64 dev proxy11-eth0
+proxy 12  has ipv6  fc00::5:534/64 dev proxy12-eth0
+proxy 13  has ipv6  fc00::5:5a3/64 dev proxy13-eth0
+proxy 14  has ipv6  fc00::5:612/64 dev proxy14-eth0
+proxy 15  has ipv6  fc00::5:681/64 dev proxy15-eth0
+proxy 16  has ipv6  fc00::5:6f0/64 dev proxy16-eth0
+proxy 17  has ipv6  fc00::5:75f/64 dev proxy17-eth0
+proxy 18  has ipv6  fc00::5:7ce/64 dev proxy18-eth0
+proxy 19  has ipv6  fc00::5:83d/64 dev proxy19-eth0
+Exercise started, press CTRL+C to stop and clean up
+
+
+
