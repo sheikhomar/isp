@@ -1,0 +1,272 @@
+[34m                   _
+           ___ ___| |___  ___ __ _ _ __
+          / __/ __| / __|/ __/ _` | '_ \
+          \__ \__ \ \__ \ (_| (_| | | | |
+          |___/___/_|___/\___\__,_|_| |_|
+
+                  Version 1.8.2
+             http://www.titania.co.uk
+        Copyright Ian Ventura-Whiting 2009
+[0m
+[32mTesting SSL server 10.0.0.4 on port 443[0m
+
+  [34mSupported Server Cipher(s):[0m
+    Failed    SSLv3  256 bits  ECDHE-RSA-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  ECDHE-ECDSA-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  ECDHE-RSA-AES256-SHA384
+    Failed    SSLv3  256 bits  ECDHE-ECDSA-AES256-SHA384
+    Accepted  SSLv3  256 bits  ECDHE-RSA-AES256-SHA
+    Rejected  SSLv3  256 bits  ECDHE-ECDSA-AES256-SHA
+    Failed    SSLv3  256 bits  SRP-DSS-AES-256-CBC-SHA
+    Failed    SSLv3  256 bits  SRP-RSA-AES-256-CBC-SHA
+    Failed    SSLv3  256 bits  SRP-AES-256-CBC-SHA
+    Failed    SSLv3  256 bits  DHE-DSS-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  DHE-RSA-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  DHE-RSA-AES256-SHA256
+    Failed    SSLv3  256 bits  DHE-DSS-AES256-SHA256
+    Accepted  SSLv3  256 bits  DHE-RSA-AES256-SHA
+    Rejected  SSLv3  256 bits  DHE-DSS-AES256-SHA
+    Accepted  SSLv3  256 bits  DHE-RSA-CAMELLIA256-SHA
+    Rejected  SSLv3  256 bits  DHE-DSS-CAMELLIA256-SHA
+    Rejected  SSLv3  256 bits  AECDH-AES256-SHA
+    Failed    SSLv3  256 bits  ADH-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  ADH-AES256-SHA256
+    Rejected  SSLv3  256 bits  ADH-AES256-SHA
+    Rejected  SSLv3  256 bits  ADH-CAMELLIA256-SHA
+    Failed    SSLv3  256 bits  ECDH-RSA-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  ECDH-ECDSA-AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  ECDH-RSA-AES256-SHA384
+    Failed    SSLv3  256 bits  ECDH-ECDSA-AES256-SHA384
+    Rejected  SSLv3  256 bits  ECDH-RSA-AES256-SHA
+    Rejected  SSLv3  256 bits  ECDH-ECDSA-AES256-SHA
+    Failed    SSLv3  256 bits  AES256-GCM-SHA384
+    Failed    SSLv3  256 bits  AES256-SHA256
+    Accepted  SSLv3  256 bits  AES256-SHA
+    Accepted  SSLv3  256 bits  CAMELLIA256-SHA
+    Failed    SSLv3  256 bits  PSK-AES256-CBC-SHA
+    Accepted  SSLv3  168 bits  ECDHE-RSA-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  ECDHE-ECDSA-DES-CBC3-SHA
+    Failed    SSLv3  168 bits  SRP-DSS-3DES-EDE-CBC-SHA
+    Failed    SSLv3  168 bits  SRP-RSA-3DES-EDE-CBC-SHA
+    Failed    SSLv3  168 bits  SRP-3DES-EDE-CBC-SHA
+    Accepted  SSLv3  168 bits  EDH-RSA-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  EDH-DSS-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  AECDH-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  ADH-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  ECDH-RSA-DES-CBC3-SHA
+    Rejected  SSLv3  168 bits  ECDH-ECDSA-DES-CBC3-SHA
+    Accepted  SSLv3  168 bits  DES-CBC3-SHA
+    Failed    SSLv3  168 bits  PSK-3DES-EDE-CBC-SHA
+    Failed    SSLv3  128 bits  ECDHE-RSA-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  ECDHE-ECDSA-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  ECDHE-RSA-AES128-SHA256
+    Failed    SSLv3  128 bits  ECDHE-ECDSA-AES128-SHA256
+    Accepted  SSLv3  128 bits  ECDHE-RSA-AES128-SHA
+    Rejected  SSLv3  128 bits  ECDHE-ECDSA-AES128-SHA
+    Failed    SSLv3  128 bits  SRP-DSS-AES-128-CBC-SHA
+    Failed    SSLv3  128 bits  SRP-RSA-AES-128-CBC-SHA
+    Failed    SSLv3  128 bits  SRP-AES-128-CBC-SHA
+    Failed    SSLv3  128 bits  DHE-DSS-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  DHE-RSA-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  DHE-RSA-AES128-SHA256
+    Failed    SSLv3  128 bits  DHE-DSS-AES128-SHA256
+    Accepted  SSLv3  128 bits  DHE-RSA-AES128-SHA
+    Rejected  SSLv3  128 bits  DHE-DSS-AES128-SHA
+    Rejected  SSLv3  128 bits  DHE-RSA-SEED-SHA
+    Rejected  SSLv3  128 bits  DHE-DSS-SEED-SHA
+    Accepted  SSLv3  128 bits  DHE-RSA-CAMELLIA128-SHA
+    Rejected  SSLv3  128 bits  DHE-DSS-CAMELLIA128-SHA
+    Rejected  SSLv3  128 bits  AECDH-AES128-SHA
+    Failed    SSLv3  128 bits  ADH-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  ADH-AES128-SHA256
+    Rejected  SSLv3  128 bits  ADH-AES128-SHA
+    Rejected  SSLv3  128 bits  ADH-SEED-SHA
+    Rejected  SSLv3  128 bits  ADH-CAMELLIA128-SHA
+    Failed    SSLv3  128 bits  ECDH-RSA-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  ECDH-ECDSA-AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  ECDH-RSA-AES128-SHA256
+    Failed    SSLv3  128 bits  ECDH-ECDSA-AES128-SHA256
+    Rejected  SSLv3  128 bits  ECDH-RSA-AES128-SHA
+    Rejected  SSLv3  128 bits  ECDH-ECDSA-AES128-SHA
+    Failed    SSLv3  128 bits  AES128-GCM-SHA256
+    Failed    SSLv3  128 bits  AES128-SHA256
+    Accepted  SSLv3  128 bits  AES128-SHA
+    Rejected  SSLv3  128 bits  SEED-SHA
+    Accepted  SSLv3  128 bits  CAMELLIA128-SHA
+    Failed    SSLv3  128 bits  PSK-AES128-CBC-SHA
+    Rejected  SSLv3  128 bits  ECDHE-RSA-RC4-SHA
+    Rejected  SSLv3  128 bits  ECDHE-ECDSA-RC4-SHA
+    Rejected  SSLv3  128 bits  AECDH-RC4-SHA
+    Rejected  SSLv3  128 bits  ADH-RC4-MD5
+    Rejected  SSLv3  128 bits  ECDH-RSA-RC4-SHA
+    Rejected  SSLv3  128 bits  ECDH-ECDSA-RC4-SHA
+    Rejected  SSLv3  128 bits  RC4-SHA
+    Rejected  SSLv3  128 bits  RC4-MD5
+    Failed    SSLv3  128 bits  PSK-RC4-SHA
+    Rejected  SSLv3  56 bits   EDH-RSA-DES-CBC-SHA
+    Rejected  SSLv3  56 bits   EDH-DSS-DES-CBC-SHA
+    Rejected  SSLv3  56 bits   ADH-DES-CBC-SHA
+    Rejected  SSLv3  56 bits   DES-CBC-SHA
+    Rejected  SSLv3  40 bits   EXP-EDH-RSA-DES-CBC-SHA
+    Rejected  SSLv3  40 bits   EXP-EDH-DSS-DES-CBC-SHA
+    Rejected  SSLv3  40 bits   EXP-ADH-DES-CBC-SHA
+    Rejected  SSLv3  40 bits   EXP-DES-CBC-SHA
+    Rejected  SSLv3  40 bits   EXP-RC2-CBC-MD5
+    Rejected  SSLv3  40 bits   EXP-ADH-RC4-MD5
+    Rejected  SSLv3  40 bits   EXP-RC4-MD5
+    Rejected  SSLv3  0 bits    ECDHE-RSA-NULL-SHA
+    Rejected  SSLv3  0 bits    ECDHE-ECDSA-NULL-SHA
+    Rejected  SSLv3  0 bits    AECDH-NULL-SHA
+    Rejected  SSLv3  0 bits    ECDH-RSA-NULL-SHA
+    Rejected  SSLv3  0 bits    ECDH-ECDSA-NULL-SHA
+    Failed    SSLv3  0 bits    NULL-SHA256
+    Rejected  SSLv3  0 bits    NULL-SHA
+    Rejected  SSLv3  0 bits    NULL-MD5
+    Failed    TLSv1  256 bits  ECDHE-RSA-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  ECDHE-ECDSA-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  ECDHE-RSA-AES256-SHA384
+    Failed    TLSv1  256 bits  ECDHE-ECDSA-AES256-SHA384
+    Accepted  TLSv1  256 bits  ECDHE-RSA-AES256-SHA
+    Rejected  TLSv1  256 bits  ECDHE-ECDSA-AES256-SHA
+    Failed    TLSv1  256 bits  SRP-DSS-AES-256-CBC-SHA
+    Failed    TLSv1  256 bits  SRP-RSA-AES-256-CBC-SHA
+    Failed    TLSv1  256 bits  SRP-AES-256-CBC-SHA
+    Failed    TLSv1  256 bits  DHE-DSS-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  DHE-RSA-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  DHE-RSA-AES256-SHA256
+    Failed    TLSv1  256 bits  DHE-DSS-AES256-SHA256
+    Accepted  TLSv1  256 bits  DHE-RSA-AES256-SHA
+    Rejected  TLSv1  256 bits  DHE-DSS-AES256-SHA
+    Accepted  TLSv1  256 bits  DHE-RSA-CAMELLIA256-SHA
+    Rejected  TLSv1  256 bits  DHE-DSS-CAMELLIA256-SHA
+    Rejected  TLSv1  256 bits  AECDH-AES256-SHA
+    Failed    TLSv1  256 bits  ADH-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  ADH-AES256-SHA256
+    Rejected  TLSv1  256 bits  ADH-AES256-SHA
+    Rejected  TLSv1  256 bits  ADH-CAMELLIA256-SHA
+    Failed    TLSv1  256 bits  ECDH-RSA-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  ECDH-ECDSA-AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  ECDH-RSA-AES256-SHA384
+    Failed    TLSv1  256 bits  ECDH-ECDSA-AES256-SHA384
+    Rejected  TLSv1  256 bits  ECDH-RSA-AES256-SHA
+    Rejected  TLSv1  256 bits  ECDH-ECDSA-AES256-SHA
+    Failed    TLSv1  256 bits  AES256-GCM-SHA384
+    Failed    TLSv1  256 bits  AES256-SHA256
+    Accepted  TLSv1  256 bits  AES256-SHA
+    Accepted  TLSv1  256 bits  CAMELLIA256-SHA
+    Failed    TLSv1  256 bits  PSK-AES256-CBC-SHA
+    Accepted  TLSv1  168 bits  ECDHE-RSA-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  ECDHE-ECDSA-DES-CBC3-SHA
+    Failed    TLSv1  168 bits  SRP-DSS-3DES-EDE-CBC-SHA
+    Failed    TLSv1  168 bits  SRP-RSA-3DES-EDE-CBC-SHA
+    Failed    TLSv1  168 bits  SRP-3DES-EDE-CBC-SHA
+    Accepted  TLSv1  168 bits  EDH-RSA-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  EDH-DSS-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  AECDH-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  ADH-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  ECDH-RSA-DES-CBC3-SHA
+    Rejected  TLSv1  168 bits  ECDH-ECDSA-DES-CBC3-SHA
+    Accepted  TLSv1  168 bits  DES-CBC3-SHA
+    Failed    TLSv1  168 bits  PSK-3DES-EDE-CBC-SHA
+    Failed    TLSv1  128 bits  ECDHE-RSA-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  ECDHE-ECDSA-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  ECDHE-RSA-AES128-SHA256
+    Failed    TLSv1  128 bits  ECDHE-ECDSA-AES128-SHA256
+    Accepted  TLSv1  128 bits  ECDHE-RSA-AES128-SHA
+    Rejected  TLSv1  128 bits  ECDHE-ECDSA-AES128-SHA
+    Failed    TLSv1  128 bits  SRP-DSS-AES-128-CBC-SHA
+    Failed    TLSv1  128 bits  SRP-RSA-AES-128-CBC-SHA
+    Failed    TLSv1  128 bits  SRP-AES-128-CBC-SHA
+    Failed    TLSv1  128 bits  DHE-DSS-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  DHE-RSA-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  DHE-RSA-AES128-SHA256
+    Failed    TLSv1  128 bits  DHE-DSS-AES128-SHA256
+    Accepted  TLSv1  128 bits  DHE-RSA-AES128-SHA
+    Rejected  TLSv1  128 bits  DHE-DSS-AES128-SHA
+    Rejected  TLSv1  128 bits  DHE-RSA-SEED-SHA
+    Rejected  TLSv1  128 bits  DHE-DSS-SEED-SHA
+    Accepted  TLSv1  128 bits  DHE-RSA-CAMELLIA128-SHA
+    Rejected  TLSv1  128 bits  DHE-DSS-CAMELLIA128-SHA
+    Rejected  TLSv1  128 bits  AECDH-AES128-SHA
+    Failed    TLSv1  128 bits  ADH-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  ADH-AES128-SHA256
+    Rejected  TLSv1  128 bits  ADH-AES128-SHA
+    Rejected  TLSv1  128 bits  ADH-SEED-SHA
+    Rejected  TLSv1  128 bits  ADH-CAMELLIA128-SHA
+    Failed    TLSv1  128 bits  ECDH-RSA-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  ECDH-ECDSA-AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  ECDH-RSA-AES128-SHA256
+    Failed    TLSv1  128 bits  ECDH-ECDSA-AES128-SHA256
+    Rejected  TLSv1  128 bits  ECDH-RSA-AES128-SHA
+    Rejected  TLSv1  128 bits  ECDH-ECDSA-AES128-SHA
+    Failed    TLSv1  128 bits  AES128-GCM-SHA256
+    Failed    TLSv1  128 bits  AES128-SHA256
+    Accepted  TLSv1  128 bits  AES128-SHA
+    Rejected  TLSv1  128 bits  SEED-SHA
+    Accepted  TLSv1  128 bits  CAMELLIA128-SHA
+    Failed    TLSv1  128 bits  PSK-AES128-CBC-SHA
+    Rejected  TLSv1  128 bits  ECDHE-RSA-RC4-SHA
+    Rejected  TLSv1  128 bits  ECDHE-ECDSA-RC4-SHA
+    Rejected  TLSv1  128 bits  AECDH-RC4-SHA
+    Rejected  TLSv1  128 bits  ADH-RC4-MD5
+    Rejected  TLSv1  128 bits  ECDH-RSA-RC4-SHA
+    Rejected  TLSv1  128 bits  ECDH-ECDSA-RC4-SHA
+    Rejected  TLSv1  128 bits  RC4-SHA
+    Rejected  TLSv1  128 bits  RC4-MD5
+    Failed    TLSv1  128 bits  PSK-RC4-SHA
+    Rejected  TLSv1  56 bits   EDH-RSA-DES-CBC-SHA
+    Rejected  TLSv1  56 bits   EDH-DSS-DES-CBC-SHA
+    Rejected  TLSv1  56 bits   ADH-DES-CBC-SHA
+    Rejected  TLSv1  56 bits   DES-CBC-SHA
+    Rejected  TLSv1  40 bits   EXP-EDH-RSA-DES-CBC-SHA
+    Rejected  TLSv1  40 bits   EXP-EDH-DSS-DES-CBC-SHA
+    Rejected  TLSv1  40 bits   EXP-ADH-DES-CBC-SHA
+    Rejected  TLSv1  40 bits   EXP-DES-CBC-SHA
+    Rejected  TLSv1  40 bits   EXP-RC2-CBC-MD5
+    Rejected  TLSv1  40 bits   EXP-ADH-RC4-MD5
+    Rejected  TLSv1  40 bits   EXP-RC4-MD5
+    Rejected  TLSv1  0 bits    ECDHE-RSA-NULL-SHA
+    Rejected  TLSv1  0 bits    ECDHE-ECDSA-NULL-SHA
+    Rejected  TLSv1  0 bits    AECDH-NULL-SHA
+    Rejected  TLSv1  0 bits    ECDH-RSA-NULL-SHA
+    Rejected  TLSv1  0 bits    ECDH-ECDSA-NULL-SHA
+    Failed    TLSv1  0 bits    NULL-SHA256
+    Rejected  TLSv1  0 bits    NULL-SHA
+    Rejected  TLSv1  0 bits    NULL-MD5
+
+  [34mPrefered Server Cipher(s):[0m
+    SSLv3  256 bits  ECDHE-RSA-AES256-SHA
+    TLSv1  256 bits  ECDHE-RSA-AES256-SHA
+
+  [34mSSL Certificate:[0m
+    Version: 2
+    Serial Number: -14211986363927460476
+    Signature Algorithm: sha256WithRSAEncryption
+    Issuer: /C=NL/ST=Overijssel/L=Enschede/O=University of Twente/OU=Org/CN=localhost
+    Not valid before: Oct  4 09:17:35 2016 GMT
+    Not valid after: Oct  2 09:17:35 2026 GMT
+    Subject: /C=NL/ST=Overijssel/L=Enschede/O=University of Twente/OU=Org/CN=localhost
+    Public Key Algorithm: rsaEncryption
+    RSA Public Key: (1024 bit)
+      Public-Key: (1024 bit)
+      Modulus:
+          00:c8:d8:5c:6e:b0:80:00:0e:23:ea:39:ce:f5:6d:
+          df:7f:81:7b:be:56:c5:5e:31:d1:f8:5a:5f:c1:3b:
+          4a:d1:db:63:dc:76:10:c8:99:25:f8:84:93:ed:78:
+          53:1e:8e:ff:0a:c8:62:e2:bd:14:92:07:44:4e:b1:
+          5c:96:7a:06:b1:fa:1a:f6:4e:e8:a5:85:d2:7c:32:
+          ec:c8:84:1a:96:f8:92:16:56:bb:84:fd:12:fa:04:
+          1b:2c:84:b5:a4:16:c3:4b:3b:10:eb:a2:7a:9b:c2:
+          ca:14:8b:ac:74:6f:aa:88:70:93:1e:ab:40:43:68:
+          b7:8f:89:a4:7c:3e:dc:87:f1
+      Exponent: 65537 (0x10001)
+    X509v3 Extensions:
+      X509v3 Subject Key Identifier: 
+        18:F6:D4:CA:56:12:5D:E2:9E:65:20:88:94:00:8B:E7:44:77:B3:84
+      X509v3 Authority Key Identifier: 
+        keyid:18:F6:D4:CA:56:12:5D:E2:9E:65:20:88:94:00:8B:E7:44:77:B3:84
+
+      X509v3 Basic Constraints: 
+        CA:TRUE
+  Verify Certificate:
+    self signed certificate
